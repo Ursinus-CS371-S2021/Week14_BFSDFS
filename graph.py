@@ -223,7 +223,7 @@ def do_dijkstra(nodes, edges, draw_labels=True, plot_fn=draw_2d_graph):
             s = get_collection_str([n[1].idx for n in queue._arr])
             plt.title("Processing {} at distance {}\n{}".format(n.idx, d, s))
         else:
-            plt.title("{} Nodes on Heap".format(len(queue)))
+            plt.title("Distance {:.3f}, {} Nodes on Heap".format(d, len(queue)))
         plt.savefig("{}.png".format(idx), bbox_inches='tight')
         (d, n) = queue.pop()
         n.visited = True
