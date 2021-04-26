@@ -2,8 +2,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class HeapTree(object):
-    def __init__(self):
+    def __init__(self, entry2idx):
         self._arr = []
+        self._entry2idx = entry2idx
+        self._idx2loc = {}
 
     def __len__(self):
         return len(self._arr)
@@ -54,6 +56,9 @@ class HeapTree(object):
         j: int
             Index of second node
         """
+        idxi = self._entry2idx(self._arr[i])
+        idxj = self._entry2idx(self._arr[j])
+        self._idx2loc[idxi], self._idx2loc[idxj] = self._idx2loc[idxj], self._idx2loc[idxi] 
         self._arr[i], self._arr[j] = self._arr[j], self._arr[i]
 
     def _upheap(self, i):
@@ -94,15 +99,26 @@ class HeapTree(object):
 
     def push(self, entry):
         """
-        Put a new value onto the heap
+        Put a new value onto the heap.  If the value already exists, only
+        update its priority if it is less
 
         Parameters
         ----------
         entry: tuple (float, ...)
             A tuple whose first entry is the priority (the rest is ignored)
         """
-        self._arr.append(entry)
-        self._upheap(len(self._arr)-1)
+        # First check to see if an entry is already there
+        idx = self._entry2idx(entry)
+        if idx in self._idx2loc:
+            # Update priority
+            loc = self._idx2loc[idx]
+            if entry[0] < self._arr[loc][0]:
+                self._arr[loc] = entry
+                self._upheap(loc)
+        else:
+            self._arr.append(entry)
+            self._idx2loc[self._entry2idx(entry)] = len(self._arr)-1
+            self._upheap(len(self._arr)-1)
     
     def peek(self):
         """
@@ -128,7 +144,7 @@ class HeapTree(object):
         ret = self._arr[0]
         # Move the last element to the root and bubble
         # down if necessary
-        self._arr[0] = self._arr[-1]
+        self._swap(0, -1)
         self._arr.pop()
         self._downheap(0)
         return ret
